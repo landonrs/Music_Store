@@ -1,31 +1,82 @@
-from tkinter import *
+import tkinter as tk
+from tkinter import font as tkfont
+from tkinter import messagebox
+from tkinter import Entry
+from tkinter import Button
 
-def callback():
-    print("called the callback!")
 
-tk_library = Tk()
+class Main_Menu(tk.Tk):
+    def __init__(self, *args, **kwargs):
+        tk.Tk.__init__(self, *args, **kwargs)
 
-# create a menu
-main_menu = Menu(tk_library)
-tk_library.config(menu=main_menu)
+        self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
+        self.minsize(height="250", width="500")
 
-filemenu = Menu(main_menu)
-main_menu.add_cascade(label="File", menu=filemenu)
-filemenu.add_command(label="New", command=callback)
-filemenu.add_command(label="Open...", command=callback)
-filemenu.add_separator()
-filemenu.add_command(label="Exit", command=callback)
+        # the container is where we'll stack a bunch of frames
+        # on top of each other, then the one we want visible
+        # will be raised above the others
+        container = tk.Frame(self)
+        container.pack(side="top", fill="both", expand=True)
+        container.grid_rowconfigure(0, weight=1)
+        container.grid_columnconfigure(0, weight=1)
 
-helpmenu = Menu(main_menu)
-main_menu.add_cascade(label="Help", menu=helpmenu)
-helpmenu.add_command(label="About...", command=callback)
+        self.frames = {}
+        for F in (StartPage, SearchPage, InsertPage):
+            page_name = F.__name__
+            frame = F(parent=container, controller=self)
+            self.frames[page_name] = frame
 
-edit = Menu(main_menu)
-main_menu.add_cascade(label="Edit", menu=edit)
-edit.add_command(label="undo", command=callback)
+            # put all of the pages in the same location;
+            # the one on the top of the stacking order
+            # will be the one that is visible.
+            frame.grid(row=0, column=0, sticky="nsew")
 
-b = Button(tk_library, text="OK", command=callback)
-b.pack()
+    def show_frame(self, page_name):
+        frame = self.frames[page_name]
+        frame.tkraise()
 
-mainloop()
+
+class StartPage(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+        label = tk.Label(self, text="This is the start page", font=controller.title_font)
+        label.pack(side="top", fill="x", pady=10)
+
+        button1 = tk.Button(self, text="Go to Search Page",
+                            command=lambda: controller.show_frame("SearchPage"))
+        button2 = tk.Button(self, text="Add items to Inventory",
+                            command=lambda: controller.show_frame("InsertPage"))
+        button1.pack()
+        button2.pack()
+
+
+class SearchPage(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+        label = tk.Label(self, text="This is the Search page", font=controller.title_font)
+        label.pack(side="top", fill="x", pady=10)
+
+        button1 = tk.Button(self, text="return to main menu",
+                            command=lambda: controller.show_frame("StartPage"))
+
+        button1.pack()
+
+
+class InsertPage(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+        label = tk.Label(self, text="This is the Insert page", font=controller.title_font)
+        label.pack(side="top", fill="x", pady=10)
+
+        button1 = tk.Button(self, text="return to main menu",
+                            command=lambda: controller.show_frame("StartPage"))
+        button1.pack()
+
+
 
