@@ -45,7 +45,7 @@ class Main_Manager(Agent):
 
         # insert first employee into DB
         cursor.execute("INSERT OR IGNORE INTO EMPLOYEES(username, password) VALUES('landonrs', 'music8')")
-        cursor.execute("INSERT OR IGNORE INTO EMPLOYEES(username, password) VALUES('skwid8', 'yourfeesh8')")
+        cursor.execute("INSERT OR IGNORE INTO EMPLOYEES(username, password) VALUES('skwid8', 'music8')")
         cursor.execute("SELECT * FROM EMPLOYEES")
         print(cursor.fetchall())
 
