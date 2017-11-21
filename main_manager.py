@@ -29,6 +29,7 @@ class Main_Manager(Agent):
         self.working = True
         self.username = ""
         self.password = ""
+        self.matches = ""
         self.initialize_DB()
 
     def initialize_DB(self):
@@ -45,7 +46,8 @@ class Main_Manager(Agent):
 
         # insert first employee into DB
         cursor.execute("INSERT OR IGNORE INTO EMPLOYEES(username, password) VALUES('landonrs', 'music8')")
-        cursor.execute("INSERT OR IGNORE INTO EMPLOYEES(username, password) VALUES('skwid8', 'yourfeesh8')")
+        cursor.execute("INSERT OR IGNORE INTO EMPLOYEES(username, password) VALUES('skwid8', 'music8')")
+        cursor.execute("INSERT OR IGNORE INTO EMPLOYEES(username, password) VALUES('nathanca', 'music8')")
         cursor.execute("SELECT * FROM EMPLOYEES")
         print(cursor.fetchall())
 
@@ -82,6 +84,18 @@ class Main_Manager(Agent):
 
     def add_item(self, name, make, model, price, image):
         self.item_name = name
+
+    def find_and_display_items(self, keyword, filter_word):
+        self.searcher.search(keyword, filter_word)
+        self.matches = self.ask("searcher", "matched_items")
+        output_text = ""
+        for match in self.matches:
+            for word in match:
+                output_text += str(word) + " "
+            output_text += "\n"
+        self.main_menu.frames["SearchPage"].search_result.config(text=output_text)
+
+
 
 
 class Main_Menu(tk.Tk):
@@ -139,6 +153,8 @@ class SearchPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
+        self.search_result = tk.Label(self, text="")
+        self.search_result.place(relx=.5, rely=.75, anchor=CENTER )
         label = tk.Label(self, text="SEARCH INVENTORY", font=controller.title_font)
         label.pack(side="top", fill="x")
         OPTIONS = [ "Type", "Make", "Model"]
@@ -149,9 +165,10 @@ class SearchPage(tk.Frame):
         search_field = Entry(self)
         search_field.place(x=200, y=100)
         search_button = tk.Button(self, text="Search for Item",
-                            command=lambda: boss.searcher.search(search_field.get(), variable.get()))
+                            command=lambda: boss.find_and_display_items(search_field.get(), variable.get()))
 
-        search_button.place(relx=.5, rely=.3, anchor=CENTER)
+        search_button.place(relx=.5, rely=.6, anchor=CENTER)
+
 
         button1 = tk.Button(self, text="return to main menu",
                             command=lambda: controller.show_frame("StartPage"))

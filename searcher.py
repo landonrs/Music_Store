@@ -8,6 +8,7 @@ class Searcher(Agent):
     def __init__(self):
         """default constructor"""
         super(Searcher, self).__init__("searcher")
+        self.matched_items = None
 
     def search(self, search_word, filter_word):
         column_name = ""
@@ -20,8 +21,10 @@ class Searcher(Agent):
 
         connection = sqlite3.connect("music_store.db")
         cursor = connection.cursor()
-        statement = "SELECT * FROM INVENTORY WHERE " + column_name + " = '" + search_word + "'"
+        statement = "SELECT item_type, item_make, item_model, '$' || CAST(item_price AS TEXT) " \
+                    "FROM INVENTORY WHERE " + column_name + " = '" + search_word + "'"
 
         cursor.execute(statement)
-        print(cursor.fetchall())
+        self.matched_items = cursor.fetchall()
+        print(self.matched_items)
         connection.close()
