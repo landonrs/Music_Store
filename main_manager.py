@@ -86,14 +86,19 @@ class Main_Manager(Agent):
         self.item_name = name
 
     def find_and_display_items(self, keyword, filter_word):
+        self.main_menu.frames["SearchPage"].search_result.delete(0, END)
         self.searcher.search(keyword, filter_word)
         self.matches = self.ask("searcher", "matched_items")
         output_text = ""
+        # for match in self.matches:
+        #     for word in match:
+        #         output_text += str(word) + " "
+        #     output_text += "\n"
         for match in self.matches:
             for word in match:
                 output_text += str(word) + " "
-            output_text += "\n"
-        self.main_menu.frames["SearchPage"].search_result.config(text=output_text)
+            self.main_menu.frames["SearchPage"].search_result.insert(END, output_text)
+
 
 
 
@@ -153,8 +158,11 @@ class SearchPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        self.search_result = tk.Label(self, text="")
-        self.search_result.place(relx=.5, rely=.75, anchor=CENTER )
+        self.search_result = tk.Listbox(self)
+        self.search_result.config(width=75, height=5)
+        self.search_result.place(relx=.5, rely=.65, anchor=CENTER )
+        scrollbar = Scrollbar(self)
+        scrollbar.pack(side=RIGHT, fill=Y)
         label = tk.Label(self, text="SEARCH INVENTORY", font=controller.title_font)
         label.pack(side="top", fill="x")
         OPTIONS = [ "Type", "Make", "Model"]
@@ -167,7 +175,11 @@ class SearchPage(tk.Frame):
         search_button = tk.Button(self, text="Search for Item",
                             command=lambda: boss.find_and_display_items(search_field.get(), variable.get()))
 
-        search_button.place(relx=.5, rely=.6, anchor=CENTER)
+        search_button.place(relx=.5, y=75, anchor=CENTER)
+
+        # attach scroll bar to search results box
+        self.search_result.config(yscrollcommand=scrollbar.set)
+        scrollbar.config(command=self.search_result.yview)
 
 
         button1 = tk.Button(self, text="return to main menu",

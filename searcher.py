@@ -22,7 +22,7 @@ class Searcher(Agent):
         connection = sqlite3.connect("music_store.db")
         cursor = connection.cursor()
         statement = "SELECT item_type, item_make, item_model, '$' || CAST(item_price AS TEXT) " \
-                    "FROM INVENTORY WHERE " + column_name + " = '" + search_word + "'"
+                    "FROM INVENTORY WHERE " + column_name + " = '" + search_word + "' COLLATE NOCASE"
 
         cursor.execute(statement)
         self.matched_items = cursor.fetchall()
